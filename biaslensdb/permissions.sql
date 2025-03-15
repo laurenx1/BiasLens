@@ -12,7 +12,10 @@ GRANT ALL PRIVILEGES ON *.* TO 'biaslensadmin'@'localhost';
 
 -- Clients (e.g. app developers interacting with the database) may only have SELECT
 -- privileges granted
-GRANT SELECT ON airbnbdb.* TO 'biaslensstudent'@'localhost';
+DROP DATABASE IF EXISTS biaslensDB;
+CREATE DATABASE biaslensDB;
+ 
+GRANT SELECT ON biaslensDB.* TO 'biaslensstudent'@'localhost';
 
 -- Flush the GRANT commands to update the privileges
 FLUSH PRIVILEGES;
