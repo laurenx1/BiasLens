@@ -8,11 +8,11 @@ CREATE USER 'biaslensstudent'@'localhost' IDENTIFIED BY 'studentpw';
 SELECT user, execute_priv FROM mysql.user;
 
 -- Admins can do all the things
-GRANT ALL PRIVILEGES ON *.* TO 'airbnbadmin'@'localhost';
+GRANT ALL PRIVILEGES ON *.* TO 'biaslensadmin'@'localhost';
 
 -- Clients (e.g. app developers interacting with the database) may only have SELECT
 -- privileges granted
-GRANT SELECT ON airbnbdb.* TO 'airbnbclient'@'localhost';
+GRANT SELECT ON airbnbdb.* TO 'biaslensstudent'@'localhost';
 
 -- Flush the GRANT commands to update the privileges
 FLUSH PRIVILEGES;
