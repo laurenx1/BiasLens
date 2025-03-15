@@ -17,6 +17,10 @@ CREATE DATABASE biaslensDB;
  
 GRANT SELECT ON biaslensDB.* TO 'biaslensstudent'@'localhost';
 
+GRANT INSERT ON biaslensDB.account TO 'biaslensstudent'@'localhost';
+GRANT UPDATE ON biaslensDB.account TO 'biaslensstudent'@'localhost';
+GRANT INSERT ON biaslensDB.student TO 'biaslensstudent'@'localhost';
+
 -- Flush the GRANT commands to update the privileges
 FLUSH PRIVILEGES;
 

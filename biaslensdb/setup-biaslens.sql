@@ -3,13 +3,18 @@
  * table that stores information on all users (both students and administrators)
  * in the db (who have already created an account)
  */
-CREATE TABLE users (
+CREATE TABLE account (
     uid CHAR(7) PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+CREATE TABLE student (
+    uid CHAR(7) PRIMARY KEY
+)
 
 
 -- INSERT INTO users (uid, username, email, password_hash)
