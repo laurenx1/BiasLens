@@ -23,7 +23,7 @@ def store_user(uid, username, email, password):
     cursor = conn.cursor()
 
     query = """
-    INSERT INTO users (uid, username, email, password_hash)
+    INSERT INTO account (uid, username, email, password_hash)
     VALUES (%s, %s, %s, %s)
     """
     cursor.execute(query, (uid, username, email, hashed_pw))
