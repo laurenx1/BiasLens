@@ -1,14 +1,14 @@
 SELECT user FROM mysql.user;
 
 -- Creating student & admin users for BiasLens
-CREATE USER 'biaslensadmin'@'localhost' IDENTIFIED BY 'adminpw';
-CREATE USER 'biaslensstudent'@'localhost' IDENTIFIED BY 'studentpw';
+CREATE USER 'biaslensadmin'@'localhost' IDENTIFIED BY 'fakepassword123';
+CREATE USER 'biaslensstudent'@'localhost' IDENTIFIED BY 'fakepw1234567';
 
 -- See the default privileges for users
 SELECT user, execute_priv FROM mysql.user;
 
 -- Admins can do all the things
-GRANT ALL PRIVILEGES ON *.* TO 'biaslensadmin'@'localhost';
+GRANT ALL PRIVILEGES ON biaslensDB.* TO 'biaslensadmin'@'localhost';
 
 -- Clients (e.g. app developers interacting with the database) may only have SELECT
 -- privileges granted
