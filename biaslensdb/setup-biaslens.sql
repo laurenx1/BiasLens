@@ -19,7 +19,7 @@ CREATE TABLE account (
     uid CHAR(7) PRIMARY KEY,
 
     -- created upon account creation
-    username VARCHAR(50) NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
 
     -- unique email to prevent duplicate signups
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -35,6 +35,23 @@ CREATE TABLE account (
     -- be required to take survey before all else
     taken_survey TINYINT(1) DEFAULT 0 NOT NULL
 );
+
+/*
+ * trigger to set account.is_admin to true if account has 
+ * specified admin uid
+ */
+DELIMITER !
+
+CREATE TRIGGER set_admin_flag
+BEFORE INSERT ON account
+FOR EACH ROW
+BEGIN
+    IF NEW.uid IN ('0000000', '1111111') THEN
+        SET NEW.is_admin = 1;
+    END IF;
+END !
+
+DELIMITER ;
 
 /*
  * Stores student-specific information.
@@ -62,7 +79,7 @@ CREATE TABLE student (
 CREATE TABLE article (
     -- unique identifier for each article
     article_id INT AUTO_INCREMENT PRIMARY KEY,
-    
+
     keyword VARCHAR(20) NOT NULL,
 
     -- basic info about the article
@@ -80,10 +97,10 @@ CREATE TABLE article (
 
     -- score that nltk model gives to article
     -- based soley on headline
-    sentiment_score INT
+    sentiment_score INT,
 
     FOREIGN KEY (keyword) REFERENCES keyword_list(keyword) ON UPDATE CASCADE ON DELETE CASCADE
-)
+);
 
 /*
  * Stores students' survey selections.
@@ -91,7 +108,7 @@ CREATE TABLE article (
 CREATE TABLE student_survey_results (
     uid CHAR(7),
     keyword VARCHAR(20) NOT NULL,
-    article_id INT,
+    article_id INT NOT NULL,
 
     -- since student chooses 5 articles per keyword (there are 8 keywords), 
     -- each uid will be associated with 5*8=40 entries in this table BUT
@@ -101,7 +118,7 @@ CREATE TABLE student_survey_results (
     PRIMARY KEY (uid, article_id),
     FOREIGN KEY (article_id) REFERENCES article(article_id) ON DELETE CASCADE,
     FOREIGN KEY (uid) REFERENCES student(uid) ON DELETE CASCADE,
-     FOREIGN KEY (keyword) REFERENCES keyword_list(keyword) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (keyword) REFERENCES keyword_list(keyword) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 

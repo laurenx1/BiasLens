@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import './App.css';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import SurveyForm from './components/SurveyForm'; // Import the SurveyForm component
 
-function App() {
+function AppContent() {
   const [isSignup, setIsSignup] = useState(false);
   const [uid, setUid] = useState('');
   const [email, setEmail] = useState('');
@@ -9,6 +11,8 @@ function App() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+
+  const navigate = useNavigate(); // Access navigate for redirection
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -31,6 +35,10 @@ function App() {
       if (response.ok) {
         setMessage(data.message);
         setError('');
+
+        // Redirect to /survey after successful login/signup
+        localStorage.setItem('uid', data.uid);
+        navigate('/survey');
       } else {
         setError(data.error || 'An error occurred.');
       }
@@ -80,8 +88,31 @@ function App() {
         {error && <p style={{ color: 'red' }}>{error}</p>}
         {message && <p style={{ color: 'green' }}>{message}</p>}
       </header>
+
+      <Routes>
+        <Route path="/survey" element={<SurveyForm />} />
+        {/* Define other routes such as /home or /admin-dashboard here */}
+      </Routes>
     </div>
   );
 }
 
+
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        {/* Add a route for "/" */}
+        <Route path="*" element={<AppContent />} />
+        <Route path="/survey" element={<SurveyForm />} />
+        {/* Add other routes here */}
+      </Routes>
+    </Router>
+  );
+}
+
 export default App;
+
+
+
