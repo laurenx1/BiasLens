@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import SurveyForm from './components/SurveyForm'; // Import the SurveyForm component
+import AdminDashboard from './components/AdminDashboard'; // Import the AdminDashboard Component
 
 function AppContent() {
   const [isSignup, setIsSignup] = useState(false);
@@ -36,9 +37,14 @@ function AppContent() {
         setMessage(data.message);
         setError('');
 
-        // Redirect to /survey after successful login/signup
+        // Redirect to after successful login/signup
+        // Redirect to admin dashboard if admin account, marked by special UID
         localStorage.setItem('uid', data.uid);
-        navigate('/survey');
+        if (localStorage.getItem('uid') === '1111111' || localStorage.getItem('uid') === '0000000' ) {
+          navigate('/admin-dashboard'); 
+        } else {
+          navigate('/survey'); // Redirect to /survey if student account
+        }
       } else {
         setError(data.error || 'An error occurred.');
       }
@@ -50,7 +56,7 @@ function AppContent() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>{isSignup ? 'Sign Up' : 'Login'}</h1>
+        <h1>{isSignup ? 'BiasLens Sign Up' : 'BiasLens Login'}</h1>
         <form onSubmit={handleAuth}>
           {isSignup && (
             <>
@@ -91,7 +97,7 @@ function AppContent() {
 
       <Routes>
         <Route path="/survey" element={<SurveyForm />} />
-        {/* Define other routes such as /home or /admin-dashboard here */}
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
     </div>
   );
@@ -106,6 +112,7 @@ function App() {
         {/* Add a route for "/" */}
         <Route path="*" element={<AppContent />} />
         <Route path="/survey" element={<SurveyForm />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
         {/* Add other routes here */}
       </Routes>
     </Router>

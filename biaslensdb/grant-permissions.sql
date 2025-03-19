@@ -7,13 +7,15 @@ CREATE USER 'biaslensstudent'@'localhost' IDENTIFIED BY 'fakepw1234567';
 -- See the default privileges for users
 SELECT user, execute_priv FROM mysql.user;
 
--- Admins can do all the things
-GRANT ALL PRIVILEGES ON biaslensDB.* TO 'biaslensadmin'@'localhost';
+
 
 -- Clients (e.g. app developers interacting with the database) may only have SELECT
 -- privileges granted
-DROP DATABASE IF EXISTS biaslensDB;
-CREATE DATABASE biaslensDB;
+
+
+
+-- Admins can do all the things
+GRANT ALL PRIVILEGES ON biaslensDB.* TO 'biaslensadmin'@'localhost';
  
 GRANT SELECT ON biaslensDB.* TO 'biaslensstudent'@'localhost';
 

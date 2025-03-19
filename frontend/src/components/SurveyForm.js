@@ -46,7 +46,7 @@ const SurveyForm = () => {
   return (
     <div className="survey-form">
       <h1>Survey</h1>
-      <form onSubmit={handleSubmit}>
+      <form id='survey1' onSubmit={handleSubmit}>
         <div>
           <label>
             Major:

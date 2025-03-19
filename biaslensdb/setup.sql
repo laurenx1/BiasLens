@@ -1,3 +1,21 @@
+-- DDL
+/*
+ * creation of the BiasLens database
+ */
+DROP DATABASE IF EXISTS biaslensDB;
+CREATE DATABASE biaslensDB;
+
+USE biaslensDB;
+
+
+-- DROP TABLE IF EXISTS statements
+DROP TABLE IF EXISTS student_survey_results;
+DROP TABLE IF EXISTS article;
+DROP TABLE IF EXISTS student;
+DROP TABLE IF EXISTS account;
+DROP TABLE IF EXISTS keyword_list;
+
+
 /*
  * Stores predefined keywords for articles.
  */
@@ -36,10 +54,15 @@ CREATE TABLE account (
     taken_survey TINYINT(1) DEFAULT 0 NOT NULL
 );
 
+
+
 /*
  * trigger to set account.is_admin to true if account has 
  * specified admin uid
+ * is_admin uids hard-coded as: 0000000 and 1111111 
+ * ^ because these cannot be real given uids
  */
+
 DELIMITER !
 
 CREATE TRIGGER set_admin_flag
