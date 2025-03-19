@@ -19,9 +19,10 @@ MUST FILL IN
 
 #### SQL setup
 
-cd biaslensdb
+> cd biaslensdb
 
-start mysql
+> sudo mysql
+
 > source setup.sql
 
 > source load.data.sql
@@ -49,6 +50,8 @@ create + activate virtual environment
 #### frontend app
 ensure Node.js, npm installed
 > cd frontend
+
 > npm install
+
 > npm start
 
