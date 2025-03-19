@@ -148,12 +148,6 @@ CREATE TABLE student_survey_results (
 
 
 
--- GRANT ALL PRIVILEGES ON your_database.* TO 'your_user'@'localhost' IDENTIFIED BY 'your_password';
--- FLUSH PRIVILEGES;
-
--- GRANT ALL PRIVILEGES ON biaslensDB.* TO adminuser@localhost IDENTIFIED BY fakepassword123;
--- FLUSH PRIVILEGES;
-
 
 -- INSERT INTO keyword_list (keyword) VALUES
 --     ('Vaccines'),

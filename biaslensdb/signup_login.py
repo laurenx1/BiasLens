@@ -1,3 +1,6 @@
+# functions that call setup-passwords.sql procedures and functions for web app
+
+# imports
 import mysql.connector
 from dotenv import load_dotenv
 import os
