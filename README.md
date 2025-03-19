@@ -17,6 +17,8 @@ MUST FILL IN
 ## Unfinished Features
 
 
+#### SQL setup
+
 cd biaslensdb
 
 start mysql
@@ -32,19 +34,21 @@ start mysql
 
 > source grant-permissions.sql
 
-python3
-in another terminal,
+#### python3
+in another terminal, from root dir.
 
-create + activate virtual environment + pip install requirements.txt
+create + activate virtual environment
+
+> pip install requirements.txt
 
 > cd biaslensdb
 
 > python3 app.py
 
 
-frontend app
+#### frontend app
 ensure Node.js, npm installed
-cd frontend
-npm install
-npm start
+> cd frontend
+> npm install
+> npm start
 
