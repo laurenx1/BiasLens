@@ -34,9 +34,12 @@ start mysql
 
 python3
 in another terminal,
+
 create + activate virtual environment + pip install requirements.txt
-cd biaslensdb
-run python3 app.py
+
+> cd biaslensdb
+
+> python3 app.py
 
 
 frontend app
