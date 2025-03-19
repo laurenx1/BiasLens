@@ -18,17 +18,23 @@ MUST FILL IN
 
 
 cd biaslensdb
+
 start mysql
 > source setup.sql
+
 > source load.data.sql
+
 > source setup-passwords.sql
+
 > source setup-routines.sql
+
 > source queries.sql 
+
 > source grant-permissions.sql
 
 python3
 in another terminal,
-activate virtual environment + pip install requirements.txt
+create + activate virtual environment + pip install requirements.txt
 cd biaslensdb
 run python3 app.py
 
