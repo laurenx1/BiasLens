@@ -5,7 +5,6 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 
-
 app = Flask(__name__)
 CORS(app)
 
@@ -31,6 +30,8 @@ def signup():
     except mysql.connector.Error as err:
         return jsonify({'error': f"Database error: {err}"}), 500
 
+
+
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
@@ -38,28 +39,28 @@ def login():
     password = data['password']
 
     try:
-        conn = mysql.connector.connect(
-            host=DB_HOST,
-            user=DB_USER_ADMIN,
-            password=DB_PASSWORD_ADMIN,
-            database=DB_NAME
-        )
-        cursor = conn.cursor(dictionary=True)
+        if verify_password(username, password):
+            conn = mysql.connector.connect(
+                host=DB_HOST,
+                user=DB_USER_ADMIN,
+                password=DB_PASSWORD_ADMIN,
+                database=DB_NAME
+            )
+            cursor = conn.cursor(dictionary=True)
 
-        query = "SELECT * FROM account WHERE username = %s"
-        cursor.execute(query, (username,))
-        user = cursor.fetchone()
-        cursor.close()
-        conn.close()
+            query = "SELECT * FROM account WHERE username = %s"
+            cursor.execute(query, (username,))
+            user = cursor.fetchone()
+            cursor.close()
+            conn.close()
 
-        if user and verify_password(password, user['password_hash']):
-            # return jsonify({'message': 'Login successful!'}), 200
             if user['is_admin'] == 1:
-                return jsonify({'status': 'success', 'redirect': '/admin-dashboard', 'uid': user['uid']})
+                return jsonify({'status': 'success', 'redirect': '/admin-dashboard', 'uid': user['uid'], 'is_admin': True})
             elif user['taken_survey'] == 0:
-                return jsonify({'status': 'success', 'redirect': '/survey', 'uid': user['uid']})
-            else:
-                return jsonify({'status': 'success', 'redirect': '/home', 'uid': user['uid']})
+                return jsonify({'status': 'success', 'redirect': '/survey', 'uid': user['uid'], 'is_admin': False})
+            else: # this will become existing student accoount, redirect to leaderboard
+                return jsonify({'status': 'success', 'redirect': '/home', 'uid': user['uid'], 'is_admin': False})
+
         else:
             return jsonify({'error': 'Invalid credentials!'}), 401
     except mysql.connector.Error as err:

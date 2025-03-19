@@ -22,6 +22,10 @@ GRANT SELECT ON biaslensDB.* TO 'biaslensstudent'@'localhost';
 GRANT SELECT, INSERT, UPDATE ON biaslensDB.account TO 'biaslensstudent'@'localhost';
 GRANT INSERT ON biaslensDB.student TO 'biaslensstudent'@'localhost';
 
+GRANT EXECUTE ON PROCEDURE `biaslensDB`.`sp_add_user` TO 'biaslensstudent'@'localhost';
+GRANT EXECUTE ON FUNCTION `biaslensDB`.`authenticate` TO 'biaslensstudent'@'localhost';
+GRANT EXECUTE ON PROCEDURE `biaslensDB`.`sp_change_password` TO 'biaslensstudent'@'localhost';
+
 -- Flush the GRANT commands to update the privileges
 FLUSH PRIVILEGES;
 

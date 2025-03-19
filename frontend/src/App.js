@@ -20,36 +20,40 @@ function AppContent() {
 
     const endpoint = isSignup ? 'signup' : 'login';
     const payload = isSignup
-      ? { uid, email, username, password }
-      : { username, password };
+        ? { uid, email, username, password }
+        : { username, password };
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        mode: 'cors', // Ensure CORS is enabled
-      });
+        const response = await fetch(`http://127.0.0.1:5000/${endpoint}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            mode: 'cors', // Ensure CORS is enabled
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        setMessage(data.message);
-        setError('');
+        if (response.ok) {
+            setMessage(data.message);
+            setError('');
 
-        // Redirect to after successful login/signup
-        // Redirect to admin dashboard if admin account, marked by special UID
-        localStorage.setItem('uid', data.uid);
-        if (localStorage.getItem('uid') === '1111111' || localStorage.getItem('uid') === '0000000' ) {
-          navigate('/admin-dashboard'); 
+            // Save uid and admin status in localStorage
+            localStorage.setItem('uid', data.uid);
+            localStorage.setItem('is_admin', data.is_admin);
+
+            // Redirect based on admin status
+            if (data.is_admin) {
+                navigate('/admin-dashboard');
+            } else if (data.redirect === '/survey') {
+                navigate('/survey');
+            } else {
+                navigate('/home');
+            }
         } else {
-          navigate('/survey'); // Redirect to /survey if student account
+            setError(data.error || 'An error occurred.');
         }
-      } else {
-        setError(data.error || 'An error occurred.');
-      }
     } catch (err) {
-      setError('An error occurred. Please try again later.');
+        setError('An error occurred. Please try again later.');
     }
   };
 
