@@ -17,6 +17,9 @@ MUST FILL IN
 ## Unfinished Features
 
 
+
+
+
 #### SQL setup
 
 > cd biaslensdb
@@ -25,9 +28,9 @@ MUST FILL IN
 
 > source setup.sql
 
-> source load.data.sql
-
 > source setup-passwords.sql
+
+> source load.data.sql
 
 > source setup-routines.sql
 

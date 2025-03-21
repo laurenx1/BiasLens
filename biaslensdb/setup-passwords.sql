@@ -30,12 +30,22 @@ END !
 DELIMITER ;
 
 
--- 
+
+-- Procedure that adds a new user to the `biaslensDB.account` table with a hashed password and a generated salt.
+-- Params:
+-- - uid (CHAR(7)): Unique identifier for the user.
+-- - new_username (VARCHAR(50)): The username of the new user.
+-- - email (VARCHAR(100)): The email address of the new user.
+-- - password (VARCHAR(20)): The plaintext password to be hashed and stored.
+-- Behavior:
+-- - Generates an 8-character salt using the `make_salt` function.
+-- - Hashes the password with the generated salt using SHA-256.
+-- - Inserts the new user record into the `account` table.
 DELIMITER !
 CREATE PROCEDURE sp_add_user(uid CHAR(7), new_username VARCHAR(50), email VARCHAR(100), password VARCHAR(20))
 BEGIN
   DECLARE salt CHAR(8);
-  SET salt = make_salt(8);
+  SET salt = make_salt(8); -- makes 8-char salt
 
   INSERT INTO biaslensDB.account (
     uid, username, email, salt, password_hash
@@ -48,6 +58,17 @@ DELIMITER ;
 
 
 
+
+-- Function to verify a user's credentials by checking the hashed password and salt.
+-- Params:
+-- - input_username (VARCHAR(20)): The username to authenticate.
+-- - input_password (VARCHAR(20)): The plaintext password to validate.
+-- Returns:
+-- - 1 (TINYINT): If the username and password are correct.
+-- - 0 (TINYINT): If the credentials are invalid.
+-- Behavior:
+-- - Combines the user's salt with the input password and hashes the result using SHA-256.
+-- - Checks if the resulting hash matches the stored password hash.
 DELIMITER !
 CREATE FUNCTION authenticate(input_username VARCHAR(20), input_password VARCHAR(20))
 RETURNS TINYINT DETERMINISTIC
@@ -65,7 +86,17 @@ END !
 DELIMITER ;
 
 
-
+-- Procedure that updates the password for an existing user in the `biaslensDB.account` table.
+-- Params:
+-- - username (VARCHAR(50)): The username of the account to update.
+-- - new_password (VARCHAR(100)): The new plaintext password to store.
+-- Behavior:
+-- - Checks if the user exists in the `account` table.
+-- - If the user exists:
+--   - Generates a new 8-character salt using the `make_salt` function.
+--   - Hashes the new password with the new salt using SHA-256.
+--   - Updates the `salt` and `password_hash` fields in the `account` table.
+-- - If the user does not exist, raises an SQL error with a descriptive message.
 DELIMITER !
 CREATE PROCEDURE sp_change_password(username VARCHAR(50), new_password VARCHAR(100))
 BEGIN
