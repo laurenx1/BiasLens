@@ -152,3 +152,26 @@ CREATE TABLE student_survey_results (
 --     ('Bird Flu'),
 --     ('Global Medicine'),
 --     ('Cancer');
+
+/*
+Creating index on article_name for speedup of queries.
+*/
+CREATE INDEX title_of_article ON article(article_title);
+
+/*
+Query to test index.
+*/
+-- [Index Query: Top 20 articles with highest sensation score]
+SELECT a.article_title, a.sensation_score
+FROM article a 
+ORDER BY a.sensation_score DESC
+LIMIT 50;
+
+/*
+View to go alongside index.
+*/
+CREATE VIEW fifty_sensationalized_articles AS 
+SELECT a.article_title, a.sensation_score
+FROM article a 
+ORDER BY a.sensation_score DESC
+LIMIT 50;

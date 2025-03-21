@@ -308,16 +308,16 @@
 /*
 Inserting all keywords into the keyword table.
 */
-INSERT INTO keyword_list
-VALUES
-    ('vaccine'), 
-    ('COVID-19'), 
-    ('american medicine'), 
-    ('wellness'),
-    ('public health'), 
-    ('bird flu'), 
-    ('global medicine'), 
-    ('cancer');
+-- INSERT INTO keyword_list
+-- VALUES
+--     ('vaccine'), 
+--     ('COVID-19'), 
+--     ('american medicine'), 
+--     ('wellness'),
+--     ('public health'), 
+--     ('bird flu'), 
+--     ('global medicine'), 
+--     ('cancer');
 
 /*
 Loading all account data from generated records.
@@ -382,7 +382,3 @@ FROM
     temp_student_records tsr
 JOIN article a
     ON tsr.article_title = a.article_title;
-
-/*
-Creating index on article_name for speedup of queries.
-*/
