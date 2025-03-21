@@ -1,10 +1,12 @@
 -- procedural sql
 -- optional trigger included in DDL as allowed by spec. 
+-- recall that UID are CHAR(7), not INT, so must be passed in as strings (surrounded by '')
 
 -- required 1 UDF
 -- function to return a student's avg sensation score by UID
 -- param: uid
 DELIMITER !
+
 CREATE FUNCTION get_avg_sensation_by_uid(input_uid CHAR(7))
 RETURNS FLOAT
 DETERMINISTIC
@@ -16,24 +18,35 @@ BEGIN
     WHERE SSR.uid = input_uid AND A.sensation_score IS NOT NULL;
     RETURN avg_sensation;
 END !
+
 DELIMITER ;
 
 
 -- function to return a student's avg sensation score by username 
--- param: username
+-- param: username VARCHAR(50)
 DELIMITER !
+
 CREATE FUNCTION get_avg_sensation_by_username(input_username VARCHAR(50))
 RETURNS FLOAT
 DETERMINISTIC
 BEGIN
-    DECLARE avg_sensation FLOAT;
-    SELECT AVG(sensation_score) INTO avg_sensation
-    FROM student_survey_results SSR
+    DECLARE avg_sensation FLOAT DEFAULT 0;
+
+    SELECT COALESCE(AVG(A.sensation_score), 0) INTO avg_sensation
+    FROM student_survey_results SSR 
     JOIN article A ON SSR.article_id = A.article_id
-    WHERE SSR.username = input_username;
+
+    -- username is not stored in student_survey_results,
+    -- must join with account table
+    JOIN account ACC ON SSR.uid = ACC.uid
+    WHERE ACC.username = input_username;
+
     RETURN avg_sensation;
 END !
+
 DELIMITER ;
+
+
 
 -- required 1 procedure
 -- choose what type of ranking that you want to see
@@ -43,14 +56,12 @@ DELIMITER ;
 
 
 
--- see self stats 
+
+-- see self stats (works by UID)
 -- only works if you have taken the survey
--- procedure to see:  your ranking, average score, and total score
 -- ranking within major, ranking within year, and ranking within house
--- Procedure: View self stats (ranking, average score, total score).
--- Procedure: View self stats (ranking, average score, total score).
--- Procedure: View self stats (ranking, average score, total score).
 DELIMITER !
+
 CREATE PROCEDURE view_self_stats(IN input_uid CHAR(7))
 BEGIN
     DECLARE self_avg FLOAT;
@@ -74,6 +85,7 @@ BEGIN
     FROM student S
     WHERE S.uid = input_uid;
 
+    -- major
     SELECT RANK() OVER (ORDER BY AVG(A.sensation_score) DESC) AS rank_in_major
     INTO @rank_in_major
     FROM student_survey_results SSR
@@ -81,6 +93,7 @@ BEGIN
     JOIN student S ON SSR.uid = S.uid
     WHERE S.major = @major;
 
+    -- graduation year
     SELECT RANK() OVER (ORDER BY AVG(A.sensation_score) DESC) AS rank_in_year
     INTO @rank_in_year
     FROM student_survey_results SSR
@@ -88,6 +101,7 @@ BEGIN
     JOIN student S ON SSR.uid = S.uid
     WHERE S.grad_year = @grad_year;
 
+    -- house
     SELECT RANK() OVER (ORDER BY AVG(A.sensation_score) DESC) AS rank_in_house
     INTO @rank_in_house
     FROM student_survey_results SSR
@@ -95,7 +109,7 @@ BEGIN
     JOIN student S ON SSR.uid = S.uid
     WHERE S.house = @house;
 
-    -- Return results.
+    -- Return results (display with 1 view).
     SELECT 
         self_avg AS avg_score, 
         self_total AS total_score, 
@@ -103,6 +117,7 @@ BEGIN
         @rank_in_year AS rank_in_year, 
         @rank_in_house AS rank_in_house;
 END !
+
 DELIMITER ;
 
 
@@ -115,6 +130,7 @@ DELIMITER ;
 -- error handling: can't be more than in the student's table
 -- returns the ranked list 
 DELIMITER !
+
 CREATE PROCEDURE view_top_x(IN x INT)
 BEGIN
     DECLARE student_count INT;
@@ -137,4 +153,5 @@ BEGIN
     ORDER BY avg_score ASC
     LIMIT x;
 END !
+
 DELIMITER ;
