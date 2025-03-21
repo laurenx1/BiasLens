@@ -22,3 +22,11 @@ build/
 
 # Ignore logs
 *.log
+
+
+121envb/
+.env/
+.envrc
+*.venv
+Pipfile
+Pipfile.lock

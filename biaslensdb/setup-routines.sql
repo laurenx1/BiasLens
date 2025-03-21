@@ -64,7 +64,7 @@ BEGIN
     -- Run a single query with CASE selection
     SELECT 
         CASE 
-            WHEN choice IN ('y', 'Y') THEN S.grad_year
+            WHEN choice IN ('y', 'Y') THEN S.grad_year -- case is insensitive
             WHEN choice IN ('h', 'H') THEN S.house
             WHEN choice IN ('m', 'M') THEN S.major
             WHEN choice IN ('a', 'A') THEN S.age
@@ -80,12 +80,6 @@ BEGIN
 END !
 
 DELIMITER ;
-
-
-
-
-
-
 
 
 

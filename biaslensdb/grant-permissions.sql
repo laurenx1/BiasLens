@@ -24,5 +24,12 @@ GRANT EXECUTE ON PROCEDURE `biaslensDB`.`sp_add_user` TO 'biaslensstudent'@'loca
 GRANT EXECUTE ON FUNCTION `biaslensDB`.`authenticate` TO 'biaslensstudent'@'localhost';
 GRANT EXECUTE ON PROCEDURE `biaslensDB`.`sp_change_password` TO 'biaslensstudent'@'localhost';
 
+GRANT EXECUTE ON PROCEDURE `biaslensDB`.`view_self_stats` TO 'biaslensstudent'@'localhost';
+GRANT EXECUTE ON PROCEDURE `biaslensDB`.`view_top_x` TO 'biaslensstudent'@'localhost';
+GRANT EXECUTE ON PROCEDURE `biaslensDB`.`rank_by_choice` TO 'biaslensstudent'@'localhost';
+
+GRANT EXECUTE ON FUNCTION `biaslensDB`.`get_avg_sensation_by_uid` TO 'biaslensstudent'@'localhost';
+GRANT EXECUTE ON FUNCTION `biaslensDB`.`get_avg_sensation_by_username` TO 'biaslensstudent'@'localhost';
+
 -- Flush the GRANT commands to update the privileges
 FLUSH PRIVILEGES;
