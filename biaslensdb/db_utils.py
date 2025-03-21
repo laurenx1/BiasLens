@@ -3,6 +3,19 @@ import mysql.connector
 
 
 def connect_db(role):
+    """
+    Establishes a connection to the MySQL database based on the specified role.
+
+    Args:
+        role (str): The role of the user connecting to the database. 
+                    Valid roles are 'admin' and 'student'.
+
+    Returns:
+        mysql.connector.connection.MySQLConnection: A connection object to the MySQL database.
+
+    Raises:
+        ValueError: If an invalid role is specified.
+    """
     if role == 'admin':
         return mysql.connector.connect(
             host='localhost',
@@ -22,6 +35,16 @@ def connect_db(role):
     
 
 def authenticate(username, password):
+    """
+    Authenticates a user by checking the provided username and password against the database.
+
+    Args:
+        username (str): The username of the user attempting to authenticate.
+        password (str): The password of the user attempting to authenticate.
+
+    Returns:
+        bool: True if authentication is successful, False otherwise.
+    """
     conn = connect_db('student')  # Use student role for authentication
     cursor = conn.cursor()
     cursor.execute("SELECT authenticate(%s, %s)", (username, password))
@@ -32,6 +55,18 @@ def authenticate(username, password):
 
 
 def signup(uid, username, email, password):
+    """
+    Registers a new user in the database by calling a stored procedure.
+
+    Args:
+        uid (str): The unique identifier for the new user.
+        username (str): The username for the new user.
+        email (str): The email address for the new user.
+        password (str): The password for the new user.
+
+    Returns:
+        None
+    """
     conn = connect_db('student')  # Use student role for signup
     cursor = conn.cursor()
     try:

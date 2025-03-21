@@ -1,7 +1,12 @@
 # app-student.py
 from db_utils import connect_db, authenticate, signup
 
+
 def student_menu():
+    """
+    Displays the menu of options available for a student account.
+    The student can input the number associated with the option they wish to execute.
+    """
     print("\nStudent Menu:")
     print("1. View Average Sensation Score (by UID)")
     print("2. View Average Sensation Score (by Username)")
@@ -10,21 +15,45 @@ def student_menu():
     print("5. View Top X Students by Sensation Score")
     print("6. Exit")
 
+
 def view_avg_sensation_by_uid(conn, uid):
+    """
+    Retrieves and displays the average sensation score for a student based on their UID.
+
+    Args:
+        conn (mysql.connector.connection.MySQLConnection): A connection object to the MySQL database.
+        uid (str): The unique identifier for the student. Must be a string of length 7.
+    """
     cursor = conn.cursor()
     cursor.execute("SELECT get_avg_sensation_by_uid(%s)", (uid,))
     result = cursor.fetchone()[0]
     print(f"Your average sensation score is: {result}")
     cursor.close()
 
+
 def view_avg_sensation_by_username(conn, username):
+    """
+    Retrieves and displays the average sensation score for a student based on their UID.
+
+    Args:
+        conn (mysql.connector.connection.MySQLConnection): A connection object to the MySQL database.
+        uid (str): The unique identifier for the student. Must be a string of length 7.
+    """
     cursor = conn.cursor()
     cursor.execute("SELECT get_avg_sensation_by_username(%s)", (username,))
     result = cursor.fetchone()[0]
     print(f"Your average sensation score is: {result}")
     cursor.close()
 
+
 def rank_by_choice(conn):
+    """
+    Ranks students based on a chosen category (e.g., graduation year, house, major, etc.)
+    and displays the results.
+
+    Args:
+        conn (mysql.connector.connection.MySQLConnection): A connection object to the MySQL database.
+    """
     print("\nRank by Category:")
     print("y - Graduation Year")
     print("h - House")
@@ -45,7 +74,16 @@ def rank_by_choice(conn):
     finally:
         cursor.close()
 
+
 def view_self_stats(conn, uid):
+    """
+    Displays statistics for the logged-in student, including their average score, total score,
+    and rankings within their major, year, and house.
+
+    Args:
+        conn (mysql.connector.connection.MySQLConnection): A connection object to the MySQL database.
+        uid (str): The unique identifier for the student.
+    """
     cursor = conn.cursor()
     try:
         cursor.callproc('view_self_stats', (uid,))
@@ -62,7 +100,14 @@ def view_self_stats(conn, uid):
     finally:
         cursor.close()
 
+
 def view_top_x(conn):
+    """
+    Displays the top X students based on their average sensation score.
+
+    Args:
+        conn (mysql.connector.connection.MySQLConnection): A connection object to the MySQL database.
+    """
     x = int(input("Enter the number of top students to view: "))
     cursor = conn.cursor()
     try:
@@ -75,6 +120,7 @@ def view_top_x(conn):
         print(f"Error: {err}")
     finally:
         cursor.close()
+
 
 def main():
     print("1. Login")

@@ -3,6 +3,10 @@ import mysql.connector
 from db_utils import connect_db, authenticate
 
 def admin_menu():
+    """
+    Displays the menu of options available for an admin account.
+    The admin can input the number associated with the option they wish to execute.
+    """
     print("\nAdmin Menu:")
     print("1. Add Student")
     print("2. Delete Student")
@@ -12,6 +16,12 @@ def admin_menu():
     print("6. Exit")
 
 def add_student(conn):
+    """
+    Adds a new student to the database by inserting their details into the `account` and `student` tables.
+
+    Args:
+        conn (mysql.connector.connection.MySQLConnection): A connection object to the MySQL database.
+    """
     uid = input("Enter UID: ")
     username = input("Enter username: ")
     email = input("Enter email: ")
@@ -39,6 +49,12 @@ def add_student(conn):
         cursor.close()
 
 def delete_student(conn):
+    """
+    Deletes a student from the database by removing their entry from the `account` table.
+
+    Args:
+        conn (mysql.connector.connection.MySQLConnection): A connection object to the MySQL database.
+    """
     uid = input("Enter UID of student to delete: ")
     cursor = conn.cursor()
     try:
