@@ -8,6 +8,16 @@ Our data comes from three sources: a survey of current Caltech students using Ai
 ### Data: Articles
 Our articles were populated using two sources, ChatGPT and the Google Chrome search engine. 
 
+We collected headlines for 8 health-related keywords: vaccines, COVID-19, american medicine, wellness,
+public health, bird flu, global medicine, and cancer.
+
+For each keyword, we collected 15 articles from a web search on Google of the keyword and another 15
+articles through GPT3. The prompt we used for GPT3 was:
+"Give me 25 news headlines relating to [keyword] and ensure there are no repeats."
+
+These articles were entered manually into our database, hosted on Airtable. 
+
+
 
 ## Instructions for loading data from the command-line in MySQL
 MUST FILL IN 

@@ -44,7 +44,7 @@ BEGIN
     RETURN avg_sensation;
 END !
 
-DELIMITER ;
+
 
 
 
