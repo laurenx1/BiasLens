@@ -1,5 +1,6 @@
 -- This file includes queries to see student demographics and article statistics
 
+-- [Query 1: Percent of Students in Each Major]
 /*
 This query returns the distribution of majors across all students.
 
@@ -18,7 +19,7 @@ SELECT
 FROM student s 
 GROUP BY s.major;
 
-
+-- [Query 2: Percent of Students in Each House]
 /*
 This query returns the distribution of houses across all students.
 
@@ -37,6 +38,7 @@ SELECT
 FROM student s 
 GROUP BY s.house;
 
+-- [Query 3: Percent of Students in Each Grad Year]
 /*
 This query returns the distribution of graduation years across all students.
 
@@ -54,6 +56,7 @@ SELECT
 FROM student s 
 GROUP BY s.grad_year;
 
+-- [Query 4: Percent of Students of Each Age]
 /*
 This query returns the distribution of age across all students.
 
@@ -70,7 +73,7 @@ FROM student s
 GROUP BY s.age
 ORDER BY s.age ASC;
 
-
+-- [Query 5: Top Article Selected per Keyword]
 /*
 Returns the top article selected per keyword. There are 8 keywords: vaccine,
 COVID-19, american medicine, wellness, public health, bird flu, global medicine,
@@ -111,6 +114,7 @@ HAVING COUNT(*) = (
 )
 ORDER BY ttc.keyword ASC;
 
+-- [Query 6: Articles Listed by Decreasing Sensation Score]
 /*
 Displays all article titles and their associated sensation scores, in order of
 decreasing sensation score.
@@ -143,22 +147,55 @@ ORDER BY a.sensation_score ASC;
 RELATIONAL ALGEBRA QUERIES
 -------------------------------------------------------------------------------
 */
--- [Query 1: ranking students in order of highest student_sensation_score, 
+-- [RA Query 1: ranking students in order of highest student_sensation_score, 
 -- grouped by major]
-SELECT a.username, s.major, q.sensation_score 
-FROM account a 
-JOIN student s on s.uid = s.uid 
-JOIN student_sensation_scores_view q ON a.uid = q.uid
-ORDER BY q.sensation_score ASCENDING;
+/*
+Outputs the average student sensation score per major.
+
+Returns:
+- q.major (VARCHAR): the possible majors for each student.
+- avg_major_score (FLOAT): the average student sensation score per major.
+*/
+SELECT 
+    -- selects major and average score per major from subquery q
+    q.major, 
+    AVG(q.student_sensation_score) as avg_major_score
+FROM 
+(   -- outputs the average sensation score per student
+    SELECT 
+        a.username, 
+        s.major, 
+        get_avg_sensation_by_username(a.username) AS student_sensation_score
+    FROM account a 
+    JOIN student s on s.uid = a.uid 
+    ORDER BY get_avg_sensation_by_username(a.username) ASC
+) q 
+-- groups all student scores by major for output
+GROUP BY q.major;
 
 -- [Query 2: projecting students with the lower than average student sensation
 -- score]
-DECLARE avg_score INT;
-SET avg_score = 
-    (SELECT AVG(sensation_score) FROM student_sensation_scores_view);
+/*
+Outputs all UIDs and usernames of all students with lower than the average 
+student sensation score across all students.
 
-SELECT a.uid, a.username, AVG(q.sensation_score)
-FROM account 
-JOIN student_sensation_scores_view q ON a.uid = q.uid 
-GROUP BY q.uid 
-WHERE 
+Returns:
+- a.uid (CHAR): the UID of each student
+- a.username (VARCHAR): the username of each student
+- student_sensation_score (FLOAT): the student sensation score of every student
+  with a student sensation score lower than 0.2.
+*/
+SELECT 
+    a.uid, 
+    a.username, 
+    get_avg_sensation_by_username(a.username) as student_sensation_score
+FROM account a
+WHERE get_avg_sensation_by_username(a.username) < (
+    SELECT AVG(avg_score) 
+    FROM (
+        SELECT (AVG(get_avg_sensation_by_username(a.username))) as avg_score 
+        FROM account a 
+        GROUP BY a.username 
+    ) sub
+)
+ORDER BY get_avg_sensation_by_username(a.username) ASC;
