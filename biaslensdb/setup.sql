@@ -112,7 +112,7 @@ CREATE TABLE article (
 
     -- score that our sensationalism model gives to the
     -- article based on its headline
-    sensation_score INT NOT NULL, 
+    sensation_score FLOAT NOT NULL, 
 
     -- score that nltk model gives to article
     -- based soley on headline

@@ -383,3 +383,6 @@ FROM
 JOIN article a
     ON tsr.article_title = a.article_title;
 
+/*
+Creating index on article_name for speedup of queries.
+*/

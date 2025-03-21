@@ -138,7 +138,7 @@ author, publisher, sensation score, and sentiment score) where the article has
 a sensation score over 0.2.
 */
 SELECT *
-FROM article 
+FROM article a
 WHERE a.sensation_score >= 0.2
 ORDER BY a.sensation_score ASC;
 
