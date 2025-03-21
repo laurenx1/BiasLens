@@ -50,8 +50,40 @@ DELIMITER ;
 
 -- required 1 procedure
 -- choose what type of ranking that you want to see
--- param: string choice, eg. house, major, year of graduation
+-- param: string choice, eg. house, major, year of graduation, age
 -- we can see the ranking of best to worst house, major, year of graduation
+DELIMITER !
+
+CREATE PROCEDURE rank_by_choice(IN choice VARCHAR(1))
+BEGIN
+    -- Validate input
+    IF choice NOT IN ('y', 'Y', 'h', 'H', 'm', 'M', 'a', 'A', 'f', 'F') THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid input';
+    END IF;
+
+    -- Run a single query with CASE selection
+    SELECT 
+        CASE 
+            WHEN choice IN ('y', 'Y') THEN S.grad_year
+            WHEN choice IN ('h', 'H') THEN S.house
+            WHEN choice IN ('m', 'M') THEN S.major
+            WHEN choice IN ('a', 'A') THEN S.age
+            WHEN choice IN ('f', 'F') THEN S.uid
+        END AS category,
+        AVG(A.sensation_score) AS avg_score
+    FROM student_survey_results SSR
+    JOIN article A ON SSR.article_id = A.article_id
+    JOIN student S ON SSR.uid = S.uid
+    GROUP BY category
+    ORDER BY avg_score DESC;
+    
+END !
+
+DELIMITER ;
+
+
+
+
 
 
 
