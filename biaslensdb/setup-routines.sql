@@ -4,11 +4,36 @@
 -- required 1 UDF
 -- function to return a student's avg sensation score by UID
 -- param: uid
+DELIMITER !
+CREATE FUNCTION get_avg_sensation_by_uid(input_uid CHAR(7))
+RETURNS FLOAT
+DETERMINISTIC
+BEGIN
+    DECLARE avg_sensation FLOAT;
+    SELECT AVG(sensation_score) INTO avg_sensation
+    FROM student_survey_results SSR
+    JOIN article A ON SSR.article_id = A.article_id
+    WHERE SSR.uid = input_uid;
+    RETURN avg_sensation;
+END $$
+DELIMITER !
 
 
 -- function to return a student's avg sensation score by username 
 -- param: username
-
+DELIMITER !
+CREATE FUNCTION get_avg_sensation_by_username(input_username VARCHAR(7))
+RETURNS FLOAT
+DETERMINISTIC
+BEGIN
+    DECLARE avg_sensation FLOAT;
+    SELECT AVG(sensation_score) INTO avg_sensation
+    FROM student_survey_results SSR
+    JOIN article A ON SSR.article_id = A.article_id
+    WHERE SSR.uid = input_uid;
+    RETURN avg_sensation;
+END $$
+DELIMITER !
 
 -- required 1 procedure
 -- choose what type of ranking that you want to see

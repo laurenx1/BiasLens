@@ -92,7 +92,7 @@ CREATE TABLE student (
     -- info about the student
     age INT CHECK (age >= 10 AND age <= 120), -- ensure valid range
     major VARCHAR(50) NOT NULL, 
-    house VARCHAR(10) NOT NULL,
+    house VARCHAR(20) NOT NULL,
     grad_year YEAR NOT NULL, 
 
     FOREIGN KEY (uid) REFERENCES account(uid) ON DELETE CASCADE
