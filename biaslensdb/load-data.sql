@@ -304,3 +304,103 @@ INSERT INTO student_survey_results (uid, keyword, article_id) VALUES
 
 -- --------------------------------------------------------------------------------
 -- loading in our partial real / partial generated data ()
+/*
+Defining function to randomly generate salt.
+*/
+DELIMITER !
+CREATE FUNCTION make_salt(num_chars INT)
+RETURNS VARCHAR(20) DETERMINISTIC
+BEGIN
+    DECLARE salt VARCHAR(20) DEFAULT '';
+
+    -- Don't want to generate more than 20 characters of salt.
+    SET num_chars = LEAST(20, num_chars);
+
+    -- Generate the salt!  Characters used are ASCII code 32 (space)
+    -- through 126 ('z').
+    WHILE num_chars > 0 DO
+        SET salt = CONCAT(salt, CHAR(32 + FLOOR(RAND() * 95)));
+        SET num_chars = num_chars - 1;
+    END WHILE;
+
+    RETURN salt;
+END !
+DELIMITER ;
+
+/*
+Inserting all keywords into the keyword table.
+*/
+INSERT INTO keyword_list
+VALUES
+    ('vaccine'), 
+    ('COVID-19'), 
+    ('american medicine'), 
+    ('wellness'),
+    ('public health'), 
+    ('bird flu'), 
+    ('global medicine'), 
+    ('cancer');
+
+/*
+Loading all account data from generated records.
+*/
+LOAD DATA LOCAL INFILE 
+    'all_data - account_data_final.csv' 
+    INTO TABLE account
+FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS
+(uid, username, email, password_hash, is_admin, taken_survey);
+
+UPDATE account 
+SET 
+    password_hash = SHA2(CONCAT(password_hash, make_salt(8)), 256);
+
+/*
+Loading all student data from generated records.
+*/
+LOAD DATA LOCAL INFILE 
+    '../data/all_data - student_data.csv' 
+    INTO TABLE student
+FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS
+(uid, name, age, major, house, grad_year);
+
+/*
+Loading all article details from created records.
+*/
+LOAD DATA LOCAL INFILE 
+    '../data/all_headlines_with_scores.csv'
+    INTO TABLE article
+FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS
+(article_title, ai_or_web, keyword, sensation_score, author, publisher);
+
+/*
+Loading student survey results from created records.
+*/
+-- temporary record holding Python-generated data of students and article
+-- selections. Python script used to generate data is included in 
+-- repo.
+DROP TABLE IF EXISTS temp_student_records;
+CREATE TEMPORARY TABLE temp_student_records (
+    uid CHAR(7) NOT NULL,
+    keyword VARCHAR(20) NOT NULL,
+    article_title VARCHAR(500) NOT NULL
+);
+
+-- loading from generated file.
+LOAD DATA LOCAL INFILE 
+    '../data/final_student_survey_selections.tsv'
+    INTO TABLE temp_student_records
+FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\n' IGNORE 1 ROWS
+(uid, keyword, article_title);
+
+-- generated file data is inserted into student_survey_results table.
+-- JOIN is used to obtain article_id from article titles.
+INSERT INTO student_survey_results (uid, keyword, article_id)
+SELECT
+    tsr.uid,
+    tsr.keyword,
+    a.article_id
+FROM
+    temp_student_records tsr
+JOIN article a
+    ON tsr.article_title = a.article_title;
+
