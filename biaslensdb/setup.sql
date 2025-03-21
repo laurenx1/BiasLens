@@ -23,7 +23,6 @@ CREATE TABLE keyword_list (
     keyword VARCHAR(20) PRIMARY KEY -- Ensures only valid keywords are used
 );
 
-
 /*
  * table that stores information on all users (students and administrators)
  * in the db (who have already created an account)
@@ -48,23 +47,18 @@ CREATE TABLE account (
 
     -- flag for whether or not the account is an administrative account 
     -- 1 = admin, 0 = student
-    is_admin TINYINT(1) DEFAULT 0 NOT NULL,
+    is_admin TINYINT DEFAULT 0 NOT NULL,
 
     -- flag for if the student has taken the survey or not
     -- if flag false (0) upon signing in, student account will 
     -- be required to take survey before all else
-    taken_survey TINYINT(1) DEFAULT 0 NOT NULL
+    taken_survey TINYINT DEFAULT 0 NOT NULL
 );
 
-
-
-/*
- * trigger to set account.is_admin to true if account has 
- * specified admin uid
- * is_admin uids hard-coded as: 0000000 and 1111111 
- * ^ because these cannot be real given uids
- */
-
+-- trigger to set account.is_admin to true if account has 
+-- specified admin uid
+-- is_admin uids hard-coded as: 0000000 and 1111111 
+-- ^ because these cannot be real given uids
 DELIMITER !
 
 CREATE TRIGGER set_admin_flag
