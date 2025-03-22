@@ -30,20 +30,8 @@ We created a machine learning model that leverages natural language processing t
 
 Here is a [link](https://docs.google.com/document/d/17bnQoCprgO3J-0tloLNk-lFUbAVOV64RHb6NZpYktYI/edit?usp=sharing ) to a document profiling the purpose of the model, the dataset used to train it, and the steps used to train the model.
 
-## Instructions for loading data from the command-line in MySQL
-MUST FILL IN 
 
-## Instructions for running the Python program (command-line arguments are supported)
-
-## Unfinished Features
-
-
-
-
-
-
-
-#### SQL setup
+#### SQL setup (Instructions for loading data from the command-line in MySQL)
 
 > cd biaslensdb
 
@@ -63,7 +51,7 @@ MUST FILL IN
 
 
 
-#### python3
+#### python3 (Instructions for running the Python program)
 in another terminal, from root dir.
 
 create + activate virtual environment
@@ -77,7 +65,7 @@ create + activate virtual environment
 
 
 
-#### frontend app
+#### frontend app / unfinished features 
 ensure Node.js, npm installed
 > cd frontend
 
