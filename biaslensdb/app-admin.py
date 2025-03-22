@@ -228,8 +228,8 @@ def main():
     username = input("Enter username: ")
     password = input("Enter password: ")
 
-    if not authenticate(username, password):
-        print("Invalid credentials.")
+    if not authenticate(username, password, "admin"):
+        print("Invalid credentials or incorrect role")
         return
 
     conn = connect_db('admin')

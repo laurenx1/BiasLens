@@ -142,8 +142,8 @@ def main():
     if choice == '1':
         username = input("Enter username: ")
         password = input("Enter password: ")
-        if not authenticate(username, password):
-            print("Invalid credentials.")
+        if not authenticate(username, password, "student"):
+            print("Invalid credentials or incorrect role")
             return
     elif choice == '2':
         uid = input("Enter UID: ")

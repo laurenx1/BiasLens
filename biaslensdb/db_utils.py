@@ -34,13 +34,14 @@ def connect_db(role):
         raise ValueError("Invalid role specified.")
     
 
-def authenticate(username, password):
+def authenticate(username, password, expected_role):
     """
     Authenticates a user by checking the provided username and password against the database.
 
     Args:
         username (str): The username of the user attempting to authenticate.
         password (str): The password of the user attempting to authenticate.
+        expected_role (str): The role expected for the login attempt ('admin' or 'student').
 
     Returns:
         bool: True if authentication is successful, False otherwise.
@@ -49,9 +50,24 @@ def authenticate(username, password):
     cursor = conn.cursor()
     cursor.execute("SELECT authenticate(%s, %s)", (username, password))
     result = cursor.fetchone()[0]
+
+    if result != 1:
+        cursor.close()
+        conn.close()
+        return False
+    
+    cursor.execute("SELECT is_admin FROM account WHERE username = %s", (username,))
+    user_is_admin = cursor.fetchone()[0]
+
+
     cursor.close()
     conn.close()
-    return result == 1
+    if expected_role == "admin" and user_is_admin == 1:
+        return True  # Admin trying to log in as admin -> OK
+    elif expected_role == "student" and user_is_admin == 0:
+        return True  # Student trying to log in as student -> OK
+    else:
+        return False  # Role mismatch -> Block access
 
 
 def signup(uid, username, email, password):
