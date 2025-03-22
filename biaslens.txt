@@ -1,0 +1,13 @@
+We created a research project that studied the sensationalism in AI vs. web 
+recommendations of news articles by analyzing the ability of these news 
+articles to grab the attention of college students. Our survey collects a 
+variety of student attributes, such as age, house, major, and graduation year. 
+Then, we have survey takers select 5 articles each for 8 health-related 
+keywords, taken from our selection of the top 15 web-retrieved and top 15 
+AI-retrieved articles on the 8 health-related keywords. 
+We present results in terms of student demographics (grouped by major, age, 
+year of graduation, and house) and in terms of overall student statistics. We 
+also allow students to view their own statistics. We hope that in this way, we 
+can reinforce in students the importance of thinking critically about the
+validity of the news they consume in a world oversaturated with false headlines
+and bad-faith reporting.
