@@ -125,3 +125,122 @@ BEGIN
   END IF;
 END !
 DELIMITER ;
+
+
+-- auxillary administrative functions 
+
+
+-- deletes a student by their uid
+DELIMITER !
+
+CREATE PROCEDURE sp_delete_student(
+    IN p_uid CHAR(7)
+)
+BEGIN
+    DELETE FROM account WHERE uid = p_uid;
+END !
+
+DELIMITER ;
+
+
+
+-- adds an article to the article table 
+-- must fill in all information 
+DELIMITER !
+
+CREATE PROCEDURE sp_add_article(
+    IN p_keyword VARCHAR(20),
+    IN p_article_title VARCHAR(500),
+    IN p_author VARCHAR(100),
+    IN p_publisher VARCHAR(100),
+    IN p_ai_or_web ENUM('ai', 'web'),
+    IN p_sensation_score FLOAT,
+    IN p_sentiment_score INT
+)
+BEGIN
+    INSERT INTO article (keyword, article_title, author, publisher, ai_or_web, sensation_score, sentiment_score)
+    VALUES (p_keyword, p_article_title, p_author, p_publisher, p_ai_or_web, p_sensation_score, p_sentiment_score);
+END !
+
+DELIMITER ;
+
+
+-- deletes an article 
+DELIMITER !
+
+CREATE PROCEDURE sp_delete_article(
+    IN p_article_id INT
+)
+BEGIN
+    DELETE FROM article WHERE article_id = p_article_id;
+END !
+
+DELIMITER ;
+
+
+
+-- updates a specified field of a specified account / student
+-- all updates shared between foreigh keys should cascade
+DELIMITER !
+
+CREATE PROCEDURE sp_update_student_account_info(
+    IN p_uid CHAR(7),
+    IN p_field VARCHAR(50),
+    IN p_value VARCHAR(255)
+)
+BEGIN
+    IF p_field = 'username' THEN
+        UPDATE account SET username = p_value WHERE uid = p_uid;
+    ELSEIF p_field = 'email' THEN
+        UPDATE account SET email = p_value WHERE uid = p_uid;
+    ELSEIF p_field = 'password_hash' THEN
+        UPDATE account SET password_hash = p_value WHERE uid = p_uid;
+    ELSEIF p_field = 'name' THEN
+        UPDATE student SET name = p_value WHERE uid = p_uid;
+    ELSEIF p_field = 'age' THEN
+        UPDATE student SET age = CAST(p_value AS SIGNED) WHERE uid = p_uid;
+    ELSEIF p_field = 'major' THEN
+        UPDATE student SET major = p_value WHERE uid = p_uid;
+    ELSEIF p_field = 'house' THEN
+        UPDATE student SET house = p_value WHERE uid = p_uid;
+    ELSEIF p_field = 'grad_year' THEN
+        UPDATE student SET grad_year = CAST(p_value AS YEAR) WHERE uid = p_uid;
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid field specified';
+    END IF;
+END !
+
+DELIMITER ;
+
+
+
+-- updates a specified field of a specified article
+-- all updates shared between foreigh keys should cascade 
+DELIMITER !
+
+CREATE PROCEDURE sp_update_article_info(
+    IN p_article_id INT,
+    IN p_field VARCHAR(50),
+    IN p_value VARCHAR(255)
+)
+BEGIN
+    IF p_field = 'keyword' THEN
+        UPDATE article SET keyword = p_value WHERE article_id = p_article_id;
+    ELSEIF p_field = 'article_title' THEN
+        UPDATE article SET article_title = p_value WHERE article_id = p_article_id;
+    ELSEIF p_field = 'author' THEN
+        UPDATE article SET author = p_value WHERE article_id = p_article_id;
+    ELSEIF p_field = 'publisher' THEN
+        UPDATE article SET publisher = p_value WHERE article_id = p_article_id;
+    ELSEIF p_field = 'ai_or_web' THEN
+        UPDATE article SET ai_or_web = p_value WHERE article_id = p_article_id;
+    ELSEIF p_field = 'sensation_score' THEN
+        UPDATE article SET sensation_score = CAST(p_value AS FLOAT) WHERE article_id = p_article_id;
+    ELSEIF p_field = 'sentiment_score' THEN
+        UPDATE article SET sentiment_score = CAST(p_value AS SIGNED) WHERE article_id = p_article_id;
+    ELSE
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid field specified';
+    END IF;
+END !
+
+DELIMITER ;
