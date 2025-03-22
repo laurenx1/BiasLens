@@ -4,6 +4,12 @@ DROP PROCEDURE IF EXISTS sp_change_password;
 DROP PROCEDURE IF EXISTS sp_add_user; 
 DROP FUNCTION IF EXISTS authenticate; 
 DROP FUNCTION IF EXISTS make_salt; 
+DROP PROCEDURE IF EXISTS sp_add_student_db;
+DROP PROCEDURE IF EXISTS sp_delete_student;
+DROP PROCEDURE IF EXISTS sp_add_article;
+DROP PROCEDURE IF EXISTS sp_delete_article;
+DROP PROCEDURE IF EXISTS sp_update_student_account_info;
+DROP PROCEDURE IF EXISTS sp_update_article_info;
 
 
 
@@ -36,13 +42,13 @@ DELIMITER ;
 -- - uid (CHAR(7)): Unique identifier for the user.
 -- - new_username (VARCHAR(50)): The username of the new user.
 -- - email (VARCHAR(100)): The email address of the new user.
--- - password (VARCHAR(20)): The plaintext password to be hashed and stored.
+-- - password (VARCHAR(100)): The plaintext password to be hashed and stored.
 -- Behavior:
 -- - Generates an 8-character salt using the `make_salt` function.
 -- - Hashes the password with the generated salt using SHA-256.
 -- - Inserts the new user record into the `account` table.
 DELIMITER !
-CREATE PROCEDURE sp_add_user(uid CHAR(7), new_username VARCHAR(50), email VARCHAR(100), password VARCHAR(20))
+CREATE PROCEDURE sp_add_user(uid CHAR(7), new_username VARCHAR(50), email VARCHAR(100), password VARCHAR(100))
 BEGIN
   DECLARE salt CHAR(8);
   SET salt = make_salt(8); -- makes 8-char salt
@@ -62,7 +68,7 @@ DELIMITER ;
 -- Function to verify a user's credentials by checking the hashed password and salt.
 -- Params:
 -- - input_username (VARCHAR(20)): The username to authenticate.
--- - input_password (VARCHAR(20)): The plaintext password to validate.
+-- - input_password (VARCHAR(100)): The plaintext password to validate.
 -- Returns:
 -- - 1 (TINYINT): If the username and password are correct.
 -- - 0 (TINYINT): If the credentials are invalid.
@@ -70,7 +76,7 @@ DELIMITER ;
 -- - Combines the user's salt with the input password and hashes the result using SHA-256.
 -- - Checks if the resulting hash matches the stored password hash.
 DELIMITER !
-CREATE FUNCTION authenticate(input_username VARCHAR(20), input_password VARCHAR(20))
+CREATE FUNCTION authenticate(input_username VARCHAR(20), input_password VARCHAR(100))
 RETURNS TINYINT DETERMINISTIC
 BEGIN
   DECLARE user_exists TINYINT;
@@ -98,7 +104,7 @@ DELIMITER ;
 --   - Updates the `salt` and `password_hash` fields in the `account` table.
 -- - If the user does not exist, raises an SQL error with a descriptive message.
 DELIMITER !
-CREATE PROCEDURE sp_change_password(username VARCHAR(50), new_password VARCHAR(100))
+CREATE PROCEDURE sp_change_password(input_username VARCHAR(50), new_password VARCHAR(100))
 BEGIN
   DECLARE new_salt VARCHAR(8); 
   DECLARE user_exists TINYINT;
@@ -107,7 +113,7 @@ BEGIN
   SELECT COUNT(*) > 0
   INTO user_exists
   FROM biaslensDB.account
-  WHERE username = username;
+  WHERE username = input_username;
 
   IF user_exists THEN
     -- Generate a new salt
@@ -117,7 +123,7 @@ BEGIN
     UPDATE biaslensDB.account
     SET salt = new_salt,
         password_hash = SHA2(CONCAT(new_salt, new_password), 256)
-    WHERE username = username;
+    WHERE username = input_username;
   ELSE
     -- Signal an error if the user does not exist
     SIGNAL SQLSTATE '45000'
@@ -129,8 +135,7 @@ DELIMITER ;
 
 -- auxillary administrative functions 
 
-
--- deletes a student by their uid
+-- Delete Student
 DELIMITER !
 
 CREATE PROCEDURE sp_delete_student(
@@ -142,10 +147,35 @@ END !
 
 DELIMITER ;
 
+-- Add Student
+DELIMITER !
 
+CREATE PROCEDURE sp_add_student_db(
+    IN p_uid CHAR(7),
+    IN p_username VARCHAR(50),
+    IN p_email VARCHAR(100),
+    IN p_password VARCHAR(255),
+    IN p_name VARCHAR(50),
+    IN p_age INT,
+    IN p_major VARCHAR(50),
+    IN p_house VARCHAR(20),
+    IN p_grad_year YEAR
+)
+BEGIN
+    DECLARE salt CHAR(8);
+    SET salt = make_salt(8);
+    -- Add to account table
+    -- uid, new_username, email, salt, SHA2(CONCAT(salt, password), 256)
+    INSERT INTO account (uid, username, email, salt, password_hash)
+    VALUES ( p_uid, p_username, p_email, salt, SHA2(CONCAT(salt, p_password), 256));
 
--- adds an article to the article table 
--- must fill in all information 
+    -- Add to student table
+    INSERT INTO student (uid, name, age, major, house, grad_year)
+    VALUES (p_uid, p_name, p_age, p_major, p_house, p_grad_year);
+END !
+DELIMITER ;
+
+-- Add Article
 DELIMITER !
 
 CREATE PROCEDURE sp_add_article(
@@ -164,8 +194,7 @@ END !
 
 DELIMITER ;
 
-
--- deletes an article 
+-- Delete Article
 DELIMITER !
 
 CREATE PROCEDURE sp_delete_article(
@@ -177,10 +206,7 @@ END !
 
 DELIMITER ;
 
-
-
--- updates a specified field of a specified account / student
--- all updates shared between foreigh keys should cascade
+-- Update Student/Account Information
 DELIMITER !
 
 CREATE PROCEDURE sp_update_student_account_info(
@@ -189,33 +215,37 @@ CREATE PROCEDURE sp_update_student_account_info(
     IN p_value VARCHAR(255)
 )
 BEGIN
-    IF p_field = 'username' THEN
-        UPDATE account SET username = p_value WHERE uid = p_uid;
-    ELSEIF p_field = 'email' THEN
-        UPDATE account SET email = p_value WHERE uid = p_uid;
-    ELSEIF p_field = 'password_hash' THEN
-        UPDATE account SET password_hash = p_value WHERE uid = p_uid;
-    ELSEIF p_field = 'name' THEN
-        UPDATE student SET name = p_value WHERE uid = p_uid;
-    ELSEIF p_field = 'age' THEN
-        UPDATE student SET age = CAST(p_value AS SIGNED) WHERE uid = p_uid;
-    ELSEIF p_field = 'major' THEN
-        UPDATE student SET major = p_value WHERE uid = p_uid;
-    ELSEIF p_field = 'house' THEN
-        UPDATE student SET house = p_value WHERE uid = p_uid;
-    ELSEIF p_field = 'grad_year' THEN
-        UPDATE student SET grad_year = CAST(p_value AS YEAR) WHERE uid = p_uid;
-    ELSE
+    DECLARE valid_fields VARCHAR(255) DEFAULT 'username,email,password_hash,name,age,major,house,grad_year';
+    
+    -- Check if the field is valid
+    IF FIND_IN_SET(p_field, valid_fields) = 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid field specified';
     END IF;
+
+    -- Update the appropriate field
+    CASE p_field
+        WHEN 'username' THEN
+            UPDATE account SET username = p_value WHERE uid = p_uid;
+        WHEN 'email' THEN
+            UPDATE account SET email = p_value WHERE uid = p_uid;
+        WHEN 'password_hash' THEN
+            UPDATE account SET password_hash = p_value WHERE uid = p_uid;
+        WHEN 'name' THEN
+            UPDATE student SET name = p_value WHERE uid = p_uid;
+        WHEN 'age' THEN
+            UPDATE student SET age = CAST(p_value AS SIGNED) WHERE uid = p_uid;
+        WHEN 'major' THEN
+            UPDATE student SET major = p_value WHERE uid = p_uid;
+        WHEN 'house' THEN
+            UPDATE student SET house = p_value WHERE uid = p_uid;
+        WHEN 'grad_year' THEN
+            UPDATE student SET grad_year = CAST(p_value AS YEAR) WHERE uid = p_uid;
+    END CASE;
 END !
 
 DELIMITER ;
 
-
-
--- updates a specified field of a specified article
--- all updates shared between foreigh keys should cascade 
+-- Update Article Information
 DELIMITER !
 
 CREATE PROCEDURE sp_update_article_info(

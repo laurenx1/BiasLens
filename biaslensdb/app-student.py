@@ -14,6 +14,7 @@ def student_menu():
     print("4. View Self Stats (Rankings within Major, Year, and House)")
     print("5. View Top X Students by Sensation Score")
     print("6. Exit")
+    print("7. View Description")
 
 
 def view_avg_sensation_by_uid(conn, uid):
@@ -122,6 +123,17 @@ def view_top_x(conn):
         cursor.close()
 
 
+def view_description(): 
+    """
+    Displays a description of the experiment / use of the BiasLens database
+    """
+    f = open('../biaslensdescription.txt', 'r')
+    file_contents = f.read()
+    print(file_contents)
+    f.close()
+
+
+
 def main():
     print("1. Login")
     print("2. Signup")
@@ -159,6 +171,8 @@ def main():
             view_self_stats(conn, uid)
         elif choice == '5':
             view_top_x(conn)
+        elif choice == '7':
+            view_description()
         elif choice == '6':
             break
     conn.close()
