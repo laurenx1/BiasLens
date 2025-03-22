@@ -323,7 +323,7 @@ Inserting all keywords into the keyword table.
 Loading all account data from generated records.
 */
 LOAD DATA LOCAL INFILE 
-    '../data/all_data - account_data_final.csv' 
+    '../data/all_account_data_final.csv' 
     INTO TABLE account
 FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS
 (uid, username, email, password_hash, is_admin, taken_survey);
