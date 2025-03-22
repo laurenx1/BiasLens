@@ -331,7 +331,7 @@ FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS
 UPDATE account 
 SET 
     salt = make_salt(8),
-    password_hash = SHA2(CONCAT(password_hash, salt), 256);
+    password_hash = SHA2(CONCAT(salt, password_hash), 256);
 
 /*
 Loading all student data from generated records.

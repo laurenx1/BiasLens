@@ -57,9 +57,11 @@ MUST FILL IN
 
 > source setup-routines.sql
 
+> source grant-permissions.sql
+
 > source queries.sql 
 
-> source grant-permissions.sql
+
 
 #### python3
 in another terminal, from root dir.
@@ -70,7 +72,9 @@ create + activate virtual environment
 
 > cd biaslensdb
 
-> python3 app.py
+> python3 app-admin.py for admin access, app-student.py for student access
+
+
 
 
 #### frontend app
