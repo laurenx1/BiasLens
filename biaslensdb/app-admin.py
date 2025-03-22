@@ -21,7 +21,7 @@ def admin_menu():
 
 def add_student(conn):
     """
-    Adds a new student to the database by calling the `sp_add_student_db` stored procedure.
+    Adds a new student to the database by calling the `sp_add_student_to_db` stored procedure.
 
     Args:
         conn (mysql.connector.connection.MySQLConnection): A connection object to the MySQL database.
@@ -38,7 +38,7 @@ def add_student(conn):
 
     cursor = conn.cursor()
     try:
-        cursor.callproc('sp_add_student_db', (uid, username, email, password, name, age, major, house, grad_year))
+        cursor.callproc('sp_add_student_to_db', (uid, username, email, password, name, age, major, house, grad_year))
         conn.commit()
         print("Student added successfully!")
     except mysql.connector.Error as err:

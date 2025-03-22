@@ -127,7 +127,7 @@ def view_description():
     """
     Displays a description of the experiment / use of the BiasLens database
     """
-    f = open('../biaslensdescription.txt', 'r')
+    f = open('../biaslens.txt', 'r')
     file_contents = f.read()
     print(file_contents)
     f.close()

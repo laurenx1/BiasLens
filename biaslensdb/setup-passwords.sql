@@ -4,7 +4,7 @@ DROP PROCEDURE IF EXISTS sp_change_password;
 DROP PROCEDURE IF EXISTS sp_add_user; 
 DROP FUNCTION IF EXISTS authenticate; 
 DROP FUNCTION IF EXISTS make_salt; 
-DROP PROCEDURE IF EXISTS sp_add_student_db;
+DROP PROCEDURE IF EXISTS sp_add_student_to_db;
 DROP PROCEDURE IF EXISTS sp_delete_student;
 DROP PROCEDURE IF EXISTS sp_add_article;
 DROP PROCEDURE IF EXISTS sp_delete_article;
@@ -147,10 +147,12 @@ END !
 
 DELIMITER ;
 
+
+
 -- Add Student
 DELIMITER !
 
-CREATE PROCEDURE sp_add_student_db(
+CREATE PROCEDURE sp_add_student_to_db(
     IN p_uid CHAR(7),
     IN p_username VARCHAR(50),
     IN p_email VARCHAR(100),
@@ -163,17 +165,55 @@ CREATE PROCEDURE sp_add_student_db(
 )
 BEGIN
     DECLARE salt CHAR(8);
+    DECLARE user_exists TINYINT;
+
+    -- Check if the uid already exists
+    SELECT COUNT(*) INTO user_exists
+    FROM account
+    WHERE uid = p_uid;
+
+    IF user_exists > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'User with this UID already exists';
+    END IF;
+
+    -- Validate input parameters
+    IF p_age < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Age must be a positive integer';
+    END IF;
+
+    IF p_grad_year < 1900 OR p_grad_year > YEAR(CURDATE()) + 10 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Invalid graduation year';
+    END IF;
+
+    -- Generate salt
     SET salt = make_salt(8);
+
+    -- Start transaction
+    START TRANSACTION;
+
     -- Add to account table
-    -- uid, new_username, email, salt, SHA2(CONCAT(salt, password), 256)
     INSERT INTO account (uid, username, email, salt, password_hash)
-    VALUES ( p_uid, p_username, p_email, salt, SHA2(CONCAT(salt, p_password), 256));
+    VALUES (p_uid, p_username, p_email, salt, SHA2(CONCAT(salt, p_password), 256));
 
     -- Add to student table
     INSERT INTO student (uid, name, age, major, house, grad_year)
     VALUES (p_uid, p_name, p_age, p_major, p_house, p_grad_year);
+
+    -- Commit transaction
+    COMMIT;
+
+    -- Return success
+    SELECT 1 AS success;
 END !
 DELIMITER ;
+
+
+
+
+
 
 -- Add Article
 DELIMITER !
@@ -194,6 +234,9 @@ END !
 
 DELIMITER ;
 
+
+
+
 -- Delete Article
 DELIMITER !
 
@@ -203,8 +246,15 @@ CREATE PROCEDURE sp_delete_article(
 BEGIN
     DELETE FROM article WHERE article_id = p_article_id;
 END !
-
 DELIMITER ;
+
+
+
+
+
+
+
+
 
 -- Update Student/Account Information
 DELIMITER !
